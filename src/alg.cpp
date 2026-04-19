@@ -4,31 +4,31 @@
 #include "tstack.h"
 
 int priority(char op) {
-    if (op == '+' || op == '-')
+    if (op == '+' || op == '-') {
         return 1;
-    if (op == '*' || op == '/')
+    } else if (op == '*' || op == '/') {
         return 2;
+    }
     return 0;
 }
 
 int calc(int a, int b, char op) {
-    if (op == '+')
+    if (op == '+') {
         return a + b;
-    if (op == '-')
+    } else if (op == '-') {
         return a - b;
-    if (op == '*')
+    } else if (op == '*') {
         return a * b;
-    if (op == '/')
+    } else if (op == '/') {
         return a / b;
+    }
     return 0;
 }
 
 std::string infx2pstfx(const std::string& inf) {
     TStack<char, 100> stack;
     std::string result = "";
-
     for (size_t i = 0; i < inf.length(); i++) {
-
         if (isdigit(inf[i])) {
             while (i < inf.length() && isdigit(inf[i])) {
                 result += inf[i];
@@ -36,76 +36,55 @@ std::string infx2pstfx(const std::string& inf) {
             }
             result += ' ';
             i--;
-        }
-
-        else if (inf[i] == '(') {
-            stack.Push('(');
-        }
-
-        else if (inf[i] == ')') {
-            while (!stack.IsEmpty() && stack.Top() != '(') {
-                result += stack.Top();
+        } else if (inf[i] == '(') {
+            stack.push('(');
+        } else if (inf[i] == ')') {
+            while (!stack.empty() && stack.top() != '(') {
+                result += stack.top();
                 result += ' ';
-                stack.Pop();
+                stack.pop();
             }
-            stack.Pop();
-        }
-
-        else if (inf[i] == '+' || inf[i] == '-' ||
-                 inf[i] == '*' || inf[i] == '/') {
-
-            while (!stack.IsEmpty() &&
-                   priority(stack.Top()) >= priority(inf[i])) {
-
-                result += stack.Top();
+            stack.pop();
+        } else if (inf[i] == '+' || inf[i] == '-' ||
+                   inf[i] == '*' || inf[i] == '/') {
+            while (!stack.empty() &&
+                   priority(stack.top()) >= priority(inf[i])) {
+                result += stack.top();
                 result += ' ';
-                stack.Pop();
+                stack.pop();
             }
-
-            stack.Push(inf[i]);
+            stack.push(inf[i]);
         }
     }
-
-    while (!stack.IsEmpty()) {
-        result += stack.Top();
+    while (!stack.empty()) {
+        result += stack.top();
         result += ' ';
-        stack.Pop();
+        stack.pop();
     }
-
-    if (!result.empty())
+    if (!result.empty()) {
         result.pop_back();
-
+    }
     return result;
 }
 
 int eval(const std::string& post) {
     TStack<int, 100> stack;
-
     for (size_t i = 0; i < post.length(); i++) {
-
         if (isdigit(post[i])) {
             int num = 0;
-
             while (i < post.length() && isdigit(post[i])) {
                 num = num * 10 + (post[i] - '0');
                 i++;
             }
-
-            stack.Push(num);
-        }
-
-        else if (post[i] == '+' || post[i] == '-' ||
-                 post[i] == '*' || post[i] == '/') {
-
-            int b = stack.Top();
-            stack.Pop();
-
-            int a = stack.Top();
-            stack.Pop();
-
-            stack.Push(calc(a, b, post[i]));
+            stack.push(num);
+        } else if (post[i] == '+' || post[i] == '-' ||
+                   post[i] == '*' || post[i] == '/') {
+            int b = stack.top();
+            stack.pop();
+            int a = stack.top();
+            stack.pop();
+            stack.push(calc(a, b, post[i]));
         }
     }
-
-    return stack.Top();
+    return stack.top();
 }
